@@ -4,16 +4,17 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
-	"github.com/lucacervasio/mosesacs/cwmp"
-	"github.com/lucacervasio/mosesacs/www"
-	"github.com/lucacervasio/mosesacs/xmpp"
-	"github.com/oleiade/lane"
-	"golang.org/x/net/websocket"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
 	"time"
+
+	"github.com/oleiade/lane"
+	"github.com/sdir/mosesacs/cwmp"
+	"github.com/sdir/mosesacs/www"
+	"github.com/sdir/mosesacs/xmpp"
+	"golang.org/x/net/websocket"
 )
 
 const Version = "0.2.6"
@@ -88,7 +89,7 @@ func CwmpHandler(w http.ResponseWriter, r *http.Request) {
 	body := string(tmp)
 	len := len(body)
 
-	//	log.Printf("body: %v", body)
+	log.Printf("body: %v", body)
 	//	log.Printf("body length: %v", len)
 
 	var envelope cwmp.SoapEnvelope
@@ -141,7 +142,7 @@ func CwmpHandler(w http.ResponseWriter, r *http.Request) {
 
 		log.Printf("Received an Inform from %s (%d bytes) with SerialNumber %s and EventCodes %s", addr, len, Inform.DeviceId.SerialNumber, Inform.GetEvents())
 		log.Printf("Soap envelope has mustUnderstand %s\n", envelope.Header.Id)
-//		logger.Logger("ciao")
+		//		logger.Logger("ciao")
 		sendAll(fmt.Sprintf("Received an Inform from %s (%d bytes) with SerialNumber %s and EventCodes %s", addr, len, Inform.DeviceId.SerialNumber, Inform.GetEvents()))
 
 		expiration := time.Now().AddDate(0, 0, 1) // expires in 1 day

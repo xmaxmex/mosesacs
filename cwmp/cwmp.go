@@ -4,11 +4,13 @@ import (
 	"crypto/rand"
 	"encoding/xml"
 	"fmt"
-//	"github.com/mxk/go-sqlite/sqlite3"
+	//	"github.com/mxk/go-sqlite/sqlite3"
 	"strconv"
 	"strings"
 	"time"
 )
+
+var soapEnv = "SOAP-ENV"
 
 type SoapEnvelope struct {
 	XMLName xml.Name
@@ -133,39 +135,36 @@ type DeviceID struct {
 func InformResponse(mustUnderstand string) string {
 	mustUnderstandHeader := ""
 	if mustUnderstand != "" {
-		mustUnderstandHeader = `<cwmp:ID soap:mustUnderstand="1">` + mustUnderstand + `</cwmp:ID>`
+		mustUnderstandHeader = `<cwmp:ID ` + soapEnv + `:mustUnderstand="1">` + mustUnderstand + `</cwmp:ID>`
 	}
 
-	return `<?xml version="1.0" encoding="UTF-8"?>
-<soap:Envelope xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:cwmp="urn:dslforum-org:cwmp-1-0" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:schemaLocation="urn:dslforum-org:cwmp-1-0 ..\schemas\wt121.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <soap:Header>` + mustUnderstandHeader + `</soap:Header>
-  <soap:Body soap:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+	return `<` + soapEnv + `:Envelope xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:cwmp="urn:dslforum-org:cwmp-1-0" xmlns:` + soapEnv + `="http://schemas.xmlsoap.org/soap/envelope/" xmlns:schemaLocation="urn:dslforum-org:cwmp-1-0 ..\schemas\wt121.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <` + soapEnv + `:Header>` + mustUnderstandHeader + `</` + soapEnv + `:Header>
+  <` + soapEnv + `:Body ` + soapEnv + `:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
     <cwmp:InformResponse>
       <MaxEnvelopes>1</MaxEnvelopes>
     </cwmp:InformResponse>
-  </soap:Body>
-</soap:Envelope>`
+  </` + soapEnv + `:Body>
+</` + soapEnv + `:Envelope>`
 }
 
 func GetParameterValues(leaf string) string {
-	return `<?xml version="1.0" encoding="UTF-8"?>
-<soap:Envelope xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:cwmp="urn:dslforum-org:cwmp-1-0" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:schemaLocation="urn:dslforum-org:cwmp-1-0 ..\schemas\wt121.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <soap:Header/>
-  <soap:Body soap:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+	return `<` + soapEnv + `:Envelope xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:cwmp="urn:dslforum-org:cwmp-1-0" xmlns:` + soapEnv + `="http://schemas.xmlsoap.org/soap/envelope/" xmlns:schemaLocation="urn:dslforum-org:cwmp-1-0 ..\schemas\wt121.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <` + soapEnv + `:Header/>
+  <` + soapEnv + `:Body ` + soapEnv + `:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
     <cwmp:GetParameterValues>
       <ParameterNames>
       	<string>` + leaf + `</string>
       </ParameterNames>
     </cwmp:GetParameterValues>
-  </soap:Body>
-</soap:Envelope>`
+  </` + soapEnv + `:Body>
+</` + soapEnv + `:Envelope>`
 }
 
 func GetParameterMultiValues(leaves []string) string {
-	msg := `<?xml version="1.0" encoding="UTF-8"?>
-<soap:Envelope xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:cwmp="urn:dslforum-org:cwmp-1-0" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:schemaLocation="urn:dslforum-org:cwmp-1-0 ..\schemas\wt121.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <soap:Header/>
-  <soap:Body soap:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+	msg := `<` + soapEnv + `:Envelope xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:cwmp="urn:dslforum-org:cwmp-1-0" xmlns:` + soapEnv + `="http://schemas.xmlsoap.org/soap/envelope/" xmlns:schemaLocation="urn:dslforum-org:cwmp-1-0 ..\schemas\wt121.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <` + soapEnv + `:Header/>
+  <` + soapEnv + `:Body ` + soapEnv + `:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
     <cwmp:GetParameterValues>
       <ParameterNames>`
 
@@ -175,16 +174,15 @@ func GetParameterMultiValues(leaves []string) string {
 	}
 	msg += `</ParameterNames>
     </cwmp:GetParameterValues>
-  </soap:Body>
-</soap:Envelope>`
+  </` + soapEnv + `:Body>
+</` + soapEnv + `:Envelope>`
 	return msg
 }
 
 func SetParameterValues(leaf string, value string) string {
-	return `<?xml version="1.0" encoding="UTF-8"?>
-<soap:Envelope xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:cwmp="urn:dslforum-org:cwmp-1-0" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:schemaLocation="urn:dslforum-org:cwmp-1-0 ..\schemas\wt121.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <soap:Header/>
-  <soap:Body soap:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+	return `<` + soapEnv + `:Envelope xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:cwmp="urn:dslforum-org:cwmp-1-0" xmlns:` + soapEnv + `="http://schemas.xmlsoap.org/soap/envelope/" xmlns:schemaLocation="urn:dslforum-org:cwmp-1-0 ..\schemas\wt121.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <` + soapEnv + `:Header/>
+  <` + soapEnv + `:Body ` + soapEnv + `:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
     <cwmp:SetParameterValues>
       <ParameterList soapenc:arrayType="cwmp:ParameterValueStruct[1]">
 		  <ParameterValueStruct>
@@ -194,8 +192,8 @@ func SetParameterValues(leaf string, value string) string {
       </ParameterList>
       <ParameterKey>LC1309` + randToken() + `</ParameterKey>
     </cwmp:SetParameterValues>
-  </soap:Body>
-</soap:Envelope>`
+  </` + soapEnv + `:Body>
+</` + soapEnv + `:Envelope>`
 }
 
 func randToken() string {
@@ -205,10 +203,9 @@ func randToken() string {
 }
 
 func SetParameterMultiValues(data map[string]string) string {
-	msg := `<?xml version="1.0" encoding="UTF-8"?>
-<soap:Envelope xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:cwmp="urn:dslforum-org:cwmp-1-0" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:schemaLocation="urn:dslforum-org:cwmp-1-0 ..\schemas\wt121.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <soap:Header/>
-  <soap:Body soap:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+	msg := `<` + soapEnv + `:Envelope xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:cwmp="urn:dslforum-org:cwmp-1-0" xmlns:` + soapEnv + `="http://schemas.xmlsoap.org/soap/envelope/" xmlns:schemaLocation="urn:dslforum-org:cwmp-1-0 ..\schemas\wt121.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <` + soapEnv + `:Header/>
+  <` + soapEnv + `:Body ` + soapEnv + `:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
     <cwmp:SetParameterValues>
       <ParameterList soapenc:arrayType="cwmp:ParameterValueStruct[` + string(len(data)) + `]">`
 
@@ -222,183 +219,177 @@ func SetParameterMultiValues(data map[string]string) string {
 	msg += `</ParameterList>
       <ParameterKey>LC1309` + randToken() + `</ParameterKey>
     </cwmp:SetParameterValues>
-  </soap:Body>
-</soap:Envelope>`
+  </` + soapEnv + `:Body>
+</` + soapEnv + `:Envelope>`
 
 	return msg
 }
 
 func GetParameterNames(leaf string, nextlevel int) string {
-	return `<?xml version="1.0" encoding="UTF-8"?>
-<soap:Envelope xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:cwmp="urn:dslforum-org:cwmp-1-0" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:schemaLocation="urn:dslforum-org:cwmp-1-0 ..\schemas\wt121.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <soap:Header/>
-  <soap:Body soap:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+	return `<` + soapEnv + `:Envelope xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:cwmp="urn:dslforum-org:cwmp-1-0" xmlns:` + soapEnv + `="http://schemas.xmlsoap.org/soap/envelope/" xmlns:schemaLocation="urn:dslforum-org:cwmp-1-0 ..\schemas\wt121.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <` + soapEnv + `:Header/>
+  <` + soapEnv + `:Body ` + soapEnv + `:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
     <cwmp:GetParameterNames>
       <ParameterPath>` + leaf + `</ParameterPath>
       <NextLevel>` + strconv.Itoa(nextlevel) + `</NextLevel>
     </cwmp:GetParameterNames>
-  </soap:Body>
-</soap:Envelope>`
+  </` + soapEnv + `:Body>
+</` + soapEnv + `:Envelope>`
 }
 
 func FactoryReset() string {
-	return `<?xml version="1.0" encoding="UTF-8"?>
-<soap:Envelope xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:cwmp="urn:dslforum-org:cwmp-1-0" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:schemaLocation="urn:dslforum-org:cwmp-1-0 ..\schemas\wt121.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <soap:Header/>
-  <soap:Body soap:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+	return `<` + soapEnv + `:Envelope xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:cwmp="urn:dslforum-org:cwmp-1-0" xmlns:` + soapEnv + `="http://schemas.xmlsoap.org/soap/envelope/" xmlns:schemaLocation="urn:dslforum-org:cwmp-1-0 ..\schemas\wt121.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <` + soapEnv + `:Header/>
+  <` + soapEnv + `:Body ` + soapEnv + `:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
     <cwmp:FactoryReset/>
-  </soap:Body>
-</soap:Envelope>`
+  </` + soapEnv + `:Body>
+</` + soapEnv + `:Envelope>`
 }
 
 func Download(filetype, url, username, password, filesize string) string {
 	// 3 Vendor Configuration File
 	// 1 Firmware Upgrade Image
 
-	return `<?xml version="1.0" encoding="UTF-8"?>
-<soap:Envelope xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:cwmp="urn:dslforum-org:cwmp-1-0" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:schemaLocation="urn:dslforum-org:cwmp-1-0 ..\schemas\wt121.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <soap:Header/>
-  <soap:Body soap:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+	return `<` + soapEnv + `:Envelope xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:cwmp="urn:dslforum-org:cwmp-1-0" xmlns:` + soapEnv + `="http://schemas.xmlsoap.org/soap/envelope/" xmlns:schemaLocation="urn:dslforum-org:cwmp-1-0 ..\schemas\wt121.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <` + soapEnv + `:Header/>
+  <` + soapEnv + `:Body ` + soapEnv + `:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
     <cwmp:Download>
       <CommandKey>MSDWK</CommandKey>
-      <FileType>`+filetype+`</FileType>
-      <URL>`+url+`</URL>
-      <Username>`+username+`</Username>
-      <Password>`+password+`</Password>
-      <FileSize>`+filesize+`</FileSize>
+      <FileType>` + filetype + `</FileType>
+      <URL>` + url + `</URL>
+      <Username>` + username + `</Username>
+      <Password>` + password + `</Password>
+      <FileSize>` + filesize + `</FileSize>
       <TargetFileName></TargetFileName>
       <DelaySeconds>0</DelaySeconds>
       <SuccessURL></SuccessURL>
       <FailureURL></FailureURL>
     </cwmp:Download>
-  </soap:Body>
-</soap:Envelope>`
+  </` + soapEnv + `:Body>
+</` + soapEnv + `:Envelope>`
 }
 
 func CancelTransfer() string {
-	return `<?xml version="1.0" encoding="UTF-8"?>
-<soap:Envelope xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:cwmp="urn:dslforum-org:cwmp-1-0" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:schemaLocation="urn:dslforum-org:cwmp-1-0 ..\schemas\wt121.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <soap:Header/>
-  <soap:Body soap:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+	return `<` + soapEnv + `:Envelope xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:cwmp="urn:dslforum-org:cwmp-1-0" xmlns:` + soapEnv + `="http://schemas.xmlsoap.org/soap/envelope/" xmlns:schemaLocation="urn:dslforum-org:cwmp-1-0 ..\schemas\wt121.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <` + soapEnv + `:Header/>
+  <` + soapEnv + `:Body ` + soapEnv + `:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
     <cwmp:CancelTransfer>
       <CommandKey></CommandKey>
     <cwmp:CancelTransfer/>
-  </soap:Body>
-</soap:Envelope>`
+  </` + soapEnv + `:Body>
+</` + soapEnv + `:Envelope>`
 }
 
 type TimeWindowStruct struct {
 	WindowStart string
-	WindowEnd string
-	WindowMode string
+	WindowEnd   string
+	WindowMode  string
 	UserMessage string
-	MaxRetries string
+	MaxRetries  string
 }
 
-func (window *TimeWindowStruct) String() string{
+func (window *TimeWindowStruct) String() string {
 	return `<TimeWindowStruct>
-<WindowStart>`+window.WindowStart+`</WindowStart>
-<WindowEnd>`+window.WindowEnd+`</WindowEnd>
-<WindowMode>`+window.WindowMode+`</WindowMode>
-<UserMessage>`+window.UserMessage+`</UserMessage>
-<MaxRetries>`+window.MaxRetries+`</MaxRetries>
+<WindowStart>` + window.WindowStart + `</WindowStart>
+<WindowEnd>` + window.WindowEnd + `</WindowEnd>
+<WindowMode>` + window.WindowMode + `</WindowMode>
+<UserMessage>` + window.UserMessage + `</UserMessage>
+<MaxRetries>` + window.MaxRetries + `</MaxRetries>
 </TimeWindowStruct>`
 }
 
 func ScheduleDownload(filetype, url, username, password, filesize string, windowslist []fmt.Stringer) string {
-	ret := `<?xml version="1.0" encoding="UTF-8"?>
-<soap:Envelope xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:cwmp="urn:dslforum-org:cwmp-1-0" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:schemaLocation="urn:dslforum-org:cwmp-1-0 ..\schemas\wt121.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <soap:Header/>
-  <soap:Body soap:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+	ret := `<` + soapEnv + `:Envelope xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:cwmp="urn:dslforum-org:cwmp-1-0" xmlns:` + soapEnv + `="http://schemas.xmlsoap.org/soap/envelope/" xmlns:schemaLocation="urn:dslforum-org:cwmp-1-0 ..\schemas\wt121.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <` + soapEnv + `:Header/>
+  <` + soapEnv + `:Body ` + soapEnv + `:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
     <cwmp:ScheduleDownload>
       <CommandKey>MSDWK</CommandKey>
-      <FileType>`+filetype+`</FileType>
-      <URL>`+url+`</URL>
-      <Username>`+username+`</Username>
-      <Password>`+password+`</Password>
-      <FileSize>`+filesize+`</FileSize>
+      <FileType>` + filetype + `</FileType>
+      <URL>` + url + `</URL>
+      <Username>` + username + `</Username>
+      <Password>` + password + `</Password>
+      <FileSize>` + filesize + `</FileSize>
       <TargetFileName></TargetFileName>
       <TimeWindowList>`
 
-		for _,op := range windowslist {
-			ret += op.String()
-		}
+	for _, op := range windowslist {
+		ret += op.String()
+	}
 
-		ret += `</TimeWindowList>
+	ret += `</TimeWindowList>
     </cwmp:ScheduleDownload>
-  </soap:Body>
-</soap:Envelope>`
+  </` + soapEnv + `:Body>
+</` + soapEnv + `:Envelope>`
 
 	return ret
 }
 
 type InstallOpStruct struct {
-	Url string
-	Uuid string
-	Username string
-	Password string
+	Url                  string
+	Uuid                 string
+	Username             string
+	Password             string
 	ExecutionEnvironment string
 }
 
 func (op *InstallOpStruct) String() string {
 	return `<InstallOpStruct>
-	<URL>`+op.Url+`</URL>
-	<UUID>`+op.Uuid+`</UUID>
-	<Username>`+op.Username+`</Username>
-	<Password>`+op.Password+`</Password>
-	<ExecutionEnvRef>`+op.ExecutionEnvironment+`</ExecutionEnvRef>
+	<URL>` + op.Url + `</URL>
+	<UUID>` + op.Uuid + `</UUID>
+	<Username>` + op.Username + `</Username>
+	<Password>` + op.Password + `</Password>
+	<ExecutionEnvRef>` + op.ExecutionEnvironment + `</ExecutionEnvRef>
 </InstallOpStruct>`
 }
 
 type UpdateOpStruct struct {
-	Uuid string
-	Version string
-	Url string
+	Uuid     string
+	Version  string
+	Url      string
 	Username string
 	Password string
 }
 
 func (op *UpdateOpStruct) String() string {
 	return `<UpdateOpStruct>
-<UUID>`+op.Uuid+`</UUID>
-<Version>`+op.Version+`</Version>
-<URL>`+op.Url+`</URL>
-<Username>`+op.Username+`</Username>
-<Password>`+op.Password+`</Password>
+<UUID>` + op.Uuid + `</UUID>
+<Version>` + op.Version + `</Version>
+<URL>` + op.Url + `</URL>
+<Username>` + op.Username + `</Username>
+<Password>` + op.Password + `</Password>
 </UpdateOpStruct>`
 }
 
 type UninstallOpStruct struct {
-	Uuid string
-	Version string
+	Uuid                 string
+	Version              string
 	ExecutionEnvironment string
 }
 
 func (op *UninstallOpStruct) String() string {
 	return `<UninstallOpStruct>
-<UUID>`+op.Uuid+`</UUID>
-<Version>`+op.Version+`</Version>
-<ExecutionEnvRef>`+op.ExecutionEnvironment+`</ExecutionEnvRef>
+<UUID>` + op.Uuid + `</UUID>
+<Version>` + op.Version + `</Version>
+<ExecutionEnvRef>` + op.ExecutionEnvironment + `</ExecutionEnvRef>
 </UninstallOpStruct>`
 }
 
 func ChangeDuState(ops []fmt.Stringer) string {
-	ret := `<?xml version="1.0" encoding="UTF-8"?>
-<soap:Envelope xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:cwmp="urn:dslforum-org:cwmp-1-0" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:schemaLocation="urn:dslforum-org:cwmp-1-0 ..\schemas\wt121.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-<soap:Header/>
-<soap:Body soap:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+	ret := `<` + soapEnv + `:Envelope xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:cwmp="urn:dslforum-org:cwmp-1-0" xmlns:` + soapEnv + `="http://schemas.xmlsoap.org/soap/envelope/" xmlns:schemaLocation="urn:dslforum-org:cwmp-1-0 ..\schemas\wt121.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<` + soapEnv + `:Header/>
+<` + soapEnv + `:Body ` + soapEnv + `:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
 <cmwp:ChangeDUState>
 <Operations>`
 
-		for _,op := range ops {
-			ret += op.String()
-		}
+	for _, op := range ops {
+		ret += op.String()
+	}
 
-		ret += `</Operations>
+	ret += `</Operations>
 <CommandKey></CommandKey>
 </cmwp:ChangeDUState>
-</soap:Body>
-</soap:Envelope>`
+</` + soapEnv + `:Body>
+</` + soapEnv + `:Envelope>`
 
 	return ret
 }
@@ -406,8 +397,8 @@ func ChangeDuState(ops []fmt.Stringer) string {
 // CPE side
 
 func Inform(serial string) string {
-	return `<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:soap-enc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:cwmp="urn:dslforum-org:cwmp-1-0"><soap:Header><cwmp:ID soap:mustUnderstand="1">5058</cwmp:ID></soap:Header>
-	<soap:Body><cwmp:Inform><DeviceId><Manufacturer>ADB Broadband</Manufacturer>
+	return `<` + soapEnv + `:Envelope xmlns:` + soapEnv + `="http://schemas.xmlsoap.org/soap/envelope/" xmlns:soap-enc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:cwmp="urn:dslforum-org:cwmp-1-0"><` + soapEnv + `:Header><cwmp:ID ` + soapEnv + `:mustUnderstand="1">5058</cwmp:ID></` + soapEnv + `:Header>
+	<` + soapEnv + `:Body><cwmp:Inform><DeviceId><Manufacturer>ADB Broadband</Manufacturer>
 <OUI>0013C8</OUI>
 <ProductClass>VV5522</ProductClass>
 <SerialNumber>PI234550701S199991-` + serial + `</SerialNumber>
@@ -447,14 +438,14 @@ func Inform(serial string) string {
 </ParameterValueStruct>
 </ParameterList>
 </cwmp:Inform>
-</soap:Body></soap:Envelope>`
+</` + soapEnv + `:Body></` + soapEnv + `:Envelope>`
 }
 
 /*
 func BuildGetParameterValuesResponse(serial string, leaves GetParameterValues_) string {
-	ret := `<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:soap-enc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:cwmp="urn:dslforum-org:cwmp-1-0">
-	<soap:Header><cwmp:ID soap:mustUnderstand="1">3</cwmp:ID></soap:Header>
-	<soap:Body><cwmp:GetParameterValuesResponse>`
+	ret := `<` + soapEnv + `:Envelope xmlns:` + soapEnv + `="http://schemas.xmlsoap.org/soap/envelope/" xmlns:soap-enc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:cwmp="urn:dslforum-org:cwmp-1-0">
+	<` + soapEnv + `:Header><cwmp:ID ` + soapEnv + `:mustUnderstand="1">3</cwmp:ID></` + soapEnv + `:Header>
+	<` + soapEnv + `:Body><cwmp:GetParameterValuesResponse>`
 
 	db, _ := sqlite3.Open("/tmp/cpe.db")
 
@@ -477,15 +468,15 @@ func BuildGetParameterValuesResponse(serial string, leaves GetParameterValues_) 
 
 	ret += `<ParameterList soap-enc:arrayType="cwmp:ParameterValueStruct[` + strconv.Itoa(n_leaves) + `]">`
 	ret += temp
-	ret += `</ParameterList></cwmp:GetParameterValuesResponse></soap:Body></soap:Envelope>`
+	ret += `</ParameterList></cwmp:GetParameterValuesResponse></` + soapEnv + `:Body></` + soapEnv + `:Envelope>`
 
 	return ret
 }
 
 func BuildGetParameterNamesResponse(serial string, leaves GetParameterNames_) string {
-	ret := `<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:soap-enc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:cwmp="urn:dslforum-org:cwmp-1-0">
-	<soap:Header><cwmp:ID soap:mustUnderstand="1">69</cwmp:ID></soap:Header>
-	<soap:Body><cwmp:GetParameterNamesResponse>`
+	ret := `<` + soapEnv + `:Envelope xmlns:` + soapEnv + `="http://schemas.xmlsoap.org/soap/envelope/" xmlns:soap-enc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:cwmp="urn:dslforum-org:cwmp-1-0">
+	<` + soapEnv + `:Header><cwmp:ID ` + soapEnv + `:mustUnderstand="1">69</cwmp:ID></` + soapEnv + `:Header>
+	<` + soapEnv + `:Body><cwmp:GetParameterNamesResponse>`
 	db, _ := sqlite3.Open("/tmp/cpe.db")
 
 	obj := make(map[string]bool)
@@ -535,7 +526,7 @@ func BuildGetParameterNamesResponse(serial string, leaves GetParameterNames_) st
 	fmt.Println(len(obj))
 	ret += `<ParameterList soap-enc:arrayType="cwmp:ParameterInfoStruct[]">`
 	ret += temp
-	ret += `</ParameterList></cwmp:GetParameterNamesResponse></soap:Body></soap:Envelope>`
+	ret += `</ParameterList></cwmp:GetParameterNamesResponse></` + soapEnv + `:Body></` + soapEnv + `:Envelope>`
 
 	return ret
 }

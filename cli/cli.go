@@ -4,13 +4,15 @@ import (
 	"encoding/json"
 	//	"encoding/xml"
 	"fmt"
+
 	"github.com/lucacervasio/liner"
 	//	"github.com/lucacervasio/mosesacs/cwmp"
-	"github.com/lucacervasio/mosesacs/cwmp"
-	"github.com/lucacervasio/mosesacs/daemon"
 	"os"
 	"os/signal"
 	"strings"
+
+	"github.com/sdir/mosesacs/cwmp"
+	"github.com/sdir/mosesacs/daemon"
 )
 
 var line *liner.State
@@ -212,8 +214,8 @@ func processCommand(cmd string) {
 		client.Write(cmd)
 	case strings.Contains(cmd, "writeMib"):
 		client.Write(cmd)
-//	case strings.Contains(cmd, "changeDuState"):
-//		client.Write(cmd)
+		//	case strings.Contains(cmd, "changeDuState"):
+		//		client.Write(cmd)
 	case strings.Contains(cmd, "GetParameterNames"):
 		client.Write(cmd)
 	case strings.Contains(cmd, "list"):

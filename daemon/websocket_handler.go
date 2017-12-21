@@ -3,12 +3,13 @@ package daemon
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/lucacervasio/mosesacs/cwmp"
-	"golang.org/x/net/websocket"
 	"regexp"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/sdir/mosesacs/cwmp"
+	"golang.org/x/net/websocket"
 )
 
 func websocketHandler(ws *websocket.Conn) {
@@ -98,7 +99,7 @@ func websocketHandler(ws *websocket.Conn) {
 					uninstall_op := &cwmp.UninstallOpStruct{Version: op["version"].(string), Uuid: op["uuid"].(string), ExecutionEnvironment: op["environment"].(string)}
 					operations = append(operations, uninstall_op)
 				}
- 			}
+			}
 
 			req := Request{i[1], ws, cwmp.ChangeDuState(operations), func(msg *WsSendMessage) error {
 				if err := websocket.JSON.Send(ws, msg); err != nil {
@@ -123,7 +124,7 @@ func websocketHandler(ws *websocket.Conn) {
 		} else if m == "download" {
 			CpeSerial := data["serial"].(string)
 
-			req := Request{CpeSerial, ws, cwmp.Download(data["filetype"].(string), data["url"].(string),data["username"].(string),data["password"].(string),data["filesize"].(string)), func(msg *WsSendMessage) error {
+			req := Request{CpeSerial, ws, cwmp.Download(data["filetype"].(string), data["url"].(string), data["username"].(string), data["password"].(string), data["filesize"].(string)), func(msg *WsSendMessage) error {
 				if err := websocket.JSON.Send(ws, msg); err != nil {
 					fmt.Println("error while sending back answer:", err)
 				}
@@ -172,19 +173,19 @@ func websocketHandler(ws *websocket.Conn) {
 
 			w := data["windows"].([]interface{})
 			var windows []fmt.Stringer
-			for _,obj := range w {
+			for _, obj := range w {
 				i := obj.(map[string]interface{})
 				wdw := &cwmp.TimeWindowStruct{
 					WindowStart: i["windowstart"].(string),
-					WindowEnd: i["windowend"].(string),
-					WindowMode: i["windowmode"].(string),
+					WindowEnd:   i["windowend"].(string),
+					WindowMode:  i["windowmode"].(string),
 					UserMessage: i["usermessage"].(string),
-					MaxRetries: i["maxretries"].(string),
+					MaxRetries:  i["maxretries"].(string),
 				}
 				windows = append(windows, wdw)
 			}
 
-			req := Request{CpeSerial, ws, cwmp.ScheduleDownload(data["filetype"].(string), data["url"].(string),data["username"].(string),data["password"].(string),data["filesize"].(string), windows), func(msg *WsSendMessage) error {
+			req := Request{CpeSerial, ws, cwmp.ScheduleDownload(data["filetype"].(string), data["url"].(string), data["username"].(string), data["password"].(string), data["filesize"].(string), windows), func(msg *WsSendMessage) error {
 				if err := websocket.JSON.Send(ws, msg); err != nil {
 					fmt.Println("error while sending back answer:", err)
 				}
@@ -303,9 +304,9 @@ func websocketHandler(ws *websocket.Conn) {
 			} else {
 				fmt.Println(fmt.Sprintf("CPE with serial %s not found", cpe))
 			}
-			fmt.Println("sono sospeso in attesa che ritorni il messaggio")
+			fmt.Println("I'm suspended waiting for you to return the message")
 			m := <-ch
-			fmt.Println("è tornato")
+			fmt.Println("is back")
 			getParameterNames := new(cwmp.GetParameterNamesResponse)
 			err := json.Unmarshal(m.Data, &getParameterNames)
 			if err != nil {
@@ -457,7 +458,7 @@ func periodicWsChecker(c *Client, quit chan bool) {
 	for {
 		select {
 		case <-ticker.C:
-//			fmt.Println("new tick on client:", c)
+			//			fmt.Println("new tick on client:", c)
 			c.Send("ping")
 		case <-quit:
 			fmt.Println("received quit command for periodicWsChecker")

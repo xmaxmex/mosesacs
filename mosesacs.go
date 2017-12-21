@@ -3,9 +3,10 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/lucacervasio/mosesacs/cli"
-	"github.com/lucacervasio/mosesacs/daemon"
 	"os"
+
+	"github.com/sdir/mosesacs/cli"
+	"github.com/sdir/mosesacs/daemon"
 )
 
 func main() {
