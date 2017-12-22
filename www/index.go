@@ -382,6 +382,31 @@ var Index = `
                 };
                 ws.send(JSON.stringify(data));
             })
+
+            $(document).on('click', ".btn", function() {
+                // var val_obj = $(this).closest("td").prev().contents('input');
+                var tr = $(this).closest("tr");
+                leaf = tr.find('.mib-object').attr('leaf');
+                set_val = tr.find('.form-control').val();
+                
+                var data = new Object();
+                data["MsgType"] = "command";
+                data["Data"] = {
+                    command:'setMib',
+                    cpe:$('#CPE_ID').val(),
+                    object:leaf,
+                    value:set_val
+                };
+                ws.send(JSON.stringify(data));
+            })
+
+            $(document).on('click', ".dropdown-toggle", function() {
+                var data = new Object();
+                data["MsgType"] = "command";
+                data["Data"] = {command:'list'};
+                ws.send(JSON.stringify(data));
+            })
+
         });
 
         function show_summary(data){
@@ -416,15 +441,26 @@ var Index = `
                 }
                 var a = $(document.createElement('a')).addClass('mib-object').attr('leaf', leaf).text(leaf).attr('href','#');
                 var writable = data[index]['Writable'];
+                var td_value;
+                var td_writable;
+
+            //  var value = (data[index]['Value']!=undefined) ? data[index]['Value'].substring(0, 100).replace(/\n/g,'<br>') : '';
+                var value = (data[index]['Value']!=undefined) ? data[index]['Value'].replace(/\n/g,'<br>').replace(/,/g,',<br>') : '';
                 if (writable!=undefined)
                     writable_array[leaf] = writable;
 
-//                var value = (data[index]['Value']!=undefined) ? data[index]['Value'].substring(0, 100).replace(/\n/g,'<br>') : '';
-                var value = (data[index]['Value']!=undefined) ? data[index]['Value'].replace(/\n/g,'<br>').replace(/,/g,',<br>') : '';
+                if (writable_array[leaf] == 1){
+                    input = $(document.createElement('input')).addClass('form-control').val(value);
+                    btn = $(document.createElement('input')).addClass('btn').addClass('btn-default').val('save').attr('type','button');
+                    td_value = $(document.createElement('td')).append(input);
+                    td_writable = $(document.createElement('td')).append(btn);
+                }else{
+                    td_value = $(document.createElement('td')).html(value);
+                    td_writable = $(document.createElement('td')).text(writable_array[leaf]);
+                }
+            //    <input class="btn btn-default" type="button" value="Input">
 
                 var td_leaf = $(document.createElement('td')).append(a).addClass('td-mib').addClass('level-'+next_level);
-                var td_value = $(document.createElement('td')).html(value);
-                var td_writable = $(document.createElement('td')).text(writable_array[leaf]);
                 var a_getvalue = $(document.createElement('a')).text('get value').attr('href','#').addClass('GetParameterValues').attr('leaf',data[index]['Name']);
                 var td_getvalue = $(document.createElement('td')).append(a_getvalue);
                 var tr = $(document.createElement('tr')).attr('tr-leaf',leaf).append(td_leaf).append(td_getvalue).append(td_value).append(td_writable).attr('level', next_level);

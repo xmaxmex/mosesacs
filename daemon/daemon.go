@@ -197,6 +197,18 @@ func CwmpHandler(w http.ResponseWriter, r *http.Request) {
 				//					fmt.Println("error while sending back answer:", err)
 				//				}
 
+			} else if e.KindOf() == "SetParameterValuesResponse" {
+				var envelope cwmp.SetParameterValuesResponse
+				xml.Unmarshal([]byte(body), &envelope)
+
+				msg := new(WsSendMessage)
+				msg.MsgType = "log"
+				var temp = make(map[string]string)
+				temp["log"] = envelope.Status
+				msg.Data, _ = json.Marshal(temp)
+
+				cpe.Waiting.Callback(msg)
+
 			} else {
 				msg := new(WsMessage)
 				msg.Cmd = body
