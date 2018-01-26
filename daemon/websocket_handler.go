@@ -462,6 +462,7 @@ func websocketHandler(ws *websocket.Conn) {
 	for i := range clients {
 		if clients[i].ws == ws {
 			clients = append(clients[:i], clients[i+1:]...)
+			break
 		}
 	}
 }
