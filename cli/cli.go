@@ -5,7 +5,7 @@ import (
 	//	"encoding/xml"
 	"fmt"
 
-	"github.com/glycerine/liner"
+	"liner"
 	//	"github.com/lucacervasio/mosesacs/cwmp"
 	"os"
 	"os/signal"
