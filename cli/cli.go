@@ -119,7 +119,8 @@ func receiver() {
 			erro := ""
 			fmt.Println("cpe list", erro)
 			for key, value := range cpes.CPES {
-				line.PrintAbovePrompt(fmt.Sprintf("CPE %s with OUI %s", key, value.OUI))
+				//line.PrintAbovePrompt(fmt.Sprintf("CPE %s with OUI %s", key, value.OUI))
+				fmt.Println(fmt.Sprintf("CPE %s with OUI %s", key, value.OUI))
 			}
 		case "GetParameterNamesResponse":
 			getParameterNames := new(cwmp.GetParameterNamesResponse)
@@ -129,7 +130,8 @@ func receiver() {
 			}
 			//			fmt.Println(getParameterNames.ParameterList)
 			for idx := range getParameterNames.ParameterList {
-				line.PrintAbovePrompt(fmt.Sprintf("%s : %s", getParameterNames.ParameterList[idx].Name, getParameterNames.ParameterList[idx].Writable))
+				//line.PrintAbovePrompt(fmt.Sprintf("%s : %s", getParameterNames.ParameterList[idx].Name, getParameterNames.ParameterList[idx].Writable))
+				fmt.Println(fmt.Sprintf("%s : %s", getParameterNames.ParameterList[idx].Name, getParameterNames.ParameterList[idx].Writable))
 			}
 		case "GetParameterValuesResponse":
 			getParameterValues := new(cwmp.GetParameterValuesResponse)
@@ -138,10 +140,12 @@ func receiver() {
 				fmt.Println("error:", err)
 			}
 			for idx := range getParameterValues.ParameterList {
-				line.PrintAbovePrompt(fmt.Sprintf("%s : %s", getParameterValues.ParameterList[idx].Name, getParameterValues.ParameterList[idx].Value))
+				//line.PrintAbovePrompt(fmt.Sprintf("%s : %s", getParameterValues.ParameterList[idx].Name, getParameterValues.ParameterList[idx].Value))
+				fmt.Println(fmt.Sprintf("%s : %s", getParameterValues.ParameterList[idx].Name, getParameterValues.ParameterList[idx].Value))
 			}
 		case "SetParameterValuesResponse":
-			line.PrintAbovePrompt(fmt.Sprintf("got SetParameterValuesResponse"))
+			//line.PrintAbovePrompt(fmt.Sprintf("got SetParameterValuesResponse"))
+			fmt.Println(fmt.Sprintf("got SetParameterValuesResponse"))
 		case "log":
 			log := make(map[string]string)
 			err := json.Unmarshal(msg.Data, &log)
@@ -153,7 +157,8 @@ func receiver() {
 			if log["log"] == "ping" {
 				// received ping from daemon
 			} else {
-				line.PrintAbovePrompt(fmt.Sprintf("%s", log["log"]))
+				//line.PrintAbovePrompt(fmt.Sprintf("%s", log["log"]))
+				fmt.Println(fmt.Sprintf("%s", log["log"]))
 			}
 
 		}
@@ -168,21 +173,24 @@ func receiver() {
 				xml.Unmarshal([]byte(msg), &envelope)
 
 				for idx := range envelope.ParameterList {
-					line.PrintAbovePrompt(string(fmt.Sprintf("%s : %s", envelope.ParameterList[idx].Name, envelope.ParameterList[idx].Value)))
+					//line.PrintAbovePrompt(string(fmt.Sprintf("%s : %s", envelope.ParameterList[idx].Name, envelope.ParameterList[idx].Value)))
+					fmt.Println(string(fmt.Sprintf("%s : %s", envelope.ParameterList[idx].Name, envelope.ParameterList[idx].Value)))
 				}
 
 			} else if e.KindOf() == "GetParameterNamesResponse" {
-				line.PrintAbovePrompt(string(msg))
+				//line.PrintAbovePrompt(string(msg))
+				fmt.Println(string(msg))
 
 				var envelope cwmp.GetParameterNamesResponse
 				xml.Unmarshal([]byte(msg), &envelope)
 
 				for idx := range envelope.ParameterList {
-					line.PrintAbovePrompt(string(fmt.Sprintf("%s : %s", envelope.ParameterList[idx].Name, envelope.ParameterList[idx].Writable)))
+					//line.PrintAbovePrompt(string(fmt.Sprintf("%s : %s", envelope.ParameterList[idx].Name, envelope.ParameterList[idx].Writable)))
+					fmt.Println(string(fmt.Sprintf("%s : %s", envelope.ParameterList[idx].Name, envelope.ParameterList[idx].Writable)))
 				}
 
 			} else {
-				line.PrintAbovePrompt(string(msg))
+				//line.PrintAbovePrompt(string(msg))
 
 			}
 
