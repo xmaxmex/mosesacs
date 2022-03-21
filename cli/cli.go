@@ -5,14 +5,14 @@ import (
 	//	"encoding/xml"
 	"fmt"
 
-	"github.com/lucacervasio/liner"
+	"github.com/glycerine/liner"
 	//	"github.com/lucacervasio/mosesacs/cwmp"
 	"os"
 	"os/signal"
 	"strings"
 
-	"github.com/sdir/mosesacs/cwmp"
-	"github.com/sdir/mosesacs/daemon"
+	"github.com/xmaxmex/mosesacs/cwmp"
+	"github.com/xmaxmex/mosesacs/daemon"
 )
 
 var line *liner.State
