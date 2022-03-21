@@ -115,7 +115,9 @@ func receiver() {
 				fmt.Println("error:", err)
 			}
 
-			line.PrintAbovePrompt("cpe list")
+			//line.PrintAbovePrompt("cpe list")
+			erro := ""
+			fmt.Println("cpe list", erro)
 			for key, value := range cpes.CPES {
 				line.PrintAbovePrompt(fmt.Sprintf("CPE %s with OUI %s", key, value.OUI))
 			}
